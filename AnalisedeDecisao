@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise de Decisão - Pontos com Peso</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        .decision-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            margin-bottom: 40px;
+        }
+
+        .decision-title {
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .decision-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .decision-input:focus {
+            border-color: #3498db;
+        }
+
+        .comparison-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .viewpoint {
+            flex: 1;
+            min-width: 300px;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pros-viewpoint {
+            background: linear-gradient(to bottom, #e8f5e9, #c8e6c9);
+            border-left: 5px solid #4caf50;
+        }
+
+        .cons-viewpoint {
+            background: linear-gradient(to bottom, #ffebee, #ffcdd2);
+            border-left: 5px solid #f44336;
+        }
+
+        .viewpoint-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+        }
+
+        .viewpoint-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+        }
+
+        .pros-icon {
+            background: #4caf50;
+        }
+
+        .cons-icon {
+            background: #f44336;
+        }
+
+        .viewpoint-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .pros-title {
+            color: #2e7d32;
+        }
+
+        .cons-title {
+            color: #c62828;
+        }
+
+        .points-list {
+            padding: 15px;
+        }
+
+        .point {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .point:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .point-icon {
+            font-size: 1.2rem;
+            margin-right: 10px;
+            min-width: 25px;
+            color: #555;
+        }
+
+        .point-content {
+            flex: 1;
+        }
+
+        .point-text {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .weight-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .weight-label {
+            margin-right: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .weight-input {
+            width: 60px;
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            text-align: center;
+        }
+
+        .input-section {
+            margin-top: 25px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .point-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .point-input:focus {
+            border-color: #3498db;
+        }
+
+        .add-point {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .add-point:hover {
+            background: #2980b9;
+        }
+
+        .decision-button {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 18px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            background: linear-gradient(to right, #3498db, #9b59b6);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .decision-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .decision-result {
+            text-align: center;
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: none;
+        }
+
+        .pros-result {
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            color: white;
+        }
+
+        .cons-result {
+            background: linear-gradient(to right, #f44336, #ff9800);
+            color: white;
+        }
+
+        .balance-result {
+            background: linear-gradient(to right, #ffeb3b, #ffc107);
+            color: #333;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-container {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-balance-scale"></i> Análise de Decisão</h1>
+            <p class="subtitle">Compare os pontos positivos e negativos de uma decisão, atribuindo pesos de 0 a 5 para cada ponto</p>
+        </header>
+
+        <main>
+            <section class="decision-box">
+                <h2 class="decision-title">Qual decisão você precisa tomar?</h2>
+                <input type="text" class="decision-input" id="decisionInput" placeholder="Descreva sua decisão aqui...">
+            </section>
+
+            <div class="comparison-container">
+                <section class="viewpoint pros-viewpoint">
+                    <div class="viewpoint-header">
+                        <div class="viewpoint-icon pros-icon">
+                            <i class="fas fa-thumbs-up"></i>
+                        </div>
+                        <h2 class="viewpoint-title pros-title">Pontos Positivos</h2>
+                    </div>
+
+                    <div class="points-list" id="prosList">
+                        <!-- Pontos positivos serão adicionados aqui -->
+                    </div>
+
+                    <div class="input-section">
+                        <label class="input-label" for="newPros">Adicionar novo ponto positivo:</label>
+                        <input type="text" class="point-input" id="newPros" placeholder="Descreva um ponto positivo...">
+                        <div class="weight-container">
+                            <span class="weight-label">Peso (0-5):</span>
+                            <input type="number" class="weight-input" id="newProsWeight" min="0" max="5" value="3">
+                        </div>
+                        <button class="add-point" id="addProsBtn"><i class="fas fa-plus"></i> Adicionar</button>
+                    </div>
+                </section>
+
+                <section class="viewpoint cons-viewpoint">
+                    <div class="viewpoint-header">
+                        <div class="viewpoint-icon cons-icon">
+                            <i class="fas fa-thumbs-down"></i>
+                        </div>
+                        <h2 class="viewpoint-title cons-title">Pontos Negativos</h2>
+                    </div>
+
+                    <div class="points-list" id="consList">
+                        <!-- Pontos negativos serão adicionados aqui -->
+                    </div>
+
+                    <div class="input-section">
+                        <label class="input-label" for="newCons">Adicionar novo ponto negativo:</label>
+                        <input type="text" class="point-input" id="newCons" placeholder="Descreva um ponto negativo...">
+                        <div class="weight-container">
+                            <span class="weight-label">Peso (0-5):</span>
+                            <input type="number" class="weight-input" id="newConsWeight" min="0" max="5" value="3">
+                        </div>
+                        <button class="add-point" id="addConsBtn"><i class="fas fa-plus"></i> Adicionar</button>
+                    </div>
+                </section>
+            </div>
+
+            <button class="decision-button" id="decisionBtn">
+                <i class="fas fa-lightbulb"></i> Tomar Decisão
+            </button>
+
+            <div class="decision-result" id="decisionResult">
+                <!-- Resultado da decisão será exibido aqui -->
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2025 Análise de Decisão - Ferramenta para ajudar na tomada de decisões conscientes</p>
+            <p>Autor: <a href="https://eliaspereirah.github.io/OrionChat/?model=qwen-3-coder-480b&platform=Cerebras">qwen-3-coder-480b</a> </p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos do DOM
+            const decisionInput = document.getElementById('decisionInput');
+            const newProsInput = document.getElementById('newPros');
+            const newConsInput = document.getElementById('newCons');
+            const newProsWeight = document.getElementById('newProsWeight');
+            const newConsWeight = document.getElementById('newConsWeight');
+            const addProsBtn = document.getElementById('addProsBtn');
+            const addConsBtn = document.getElementById('addConsBtn');
+            const decisionBtn = document.getElementById('decisionBtn');
+            const decisionResult = document.getElementById('decisionResult');
+            const prosList = document.getElementById('prosList');
+            const consList = document.getElementById('consList');
+
+            // Adicionar ponto positivo
+            addProsBtn.addEventListener('click', function() {
+                const text = newProsInput.value.trim();
+                const weight = parseInt(newProsWeight.value) || 0;
+
+                if (text) {
+                    if (weight < 0 || weight > 5) {
+                        alert('O peso deve estar entre 0 e 5');
+                        newProsWeight.focus();
+                        return;
+                    }
+
+                    addPoint(prosList, text, weight, 'fa-plus-circle', 'point');
+                    newProsInput.value = '';
+                    newProsWeight.value = '3';
+                    newProsInput.focus();
+                }
+            });
+
+            // Adicionar ponto negativo
+            addConsBtn.addEventListener('click', function() {
+                const text = newConsInput.value.trim();
+                const weight = parseInt(newConsWeight.value) || 0;
+
+                if (text) {
+                    if (weight < 0 || weight > 5) {
+                        alert('O peso deve estar entre 0 e 5');
+                        newConsWeight.focus();
+                        return;
+                    }
+
+                    addPoint(consList, text, weight, 'fa-minus-circle', 'point');
+                    newConsInput.value = '';
+                    newConsWeight.value = '3';
+                    newConsInput.focus();
+                }
+            });
+
+            // Função para adicionar ponto à lista
+            function addPoint(list, text, weight, iconClass, pointClass) {
+                const pointDiv = document.createElement('div');
+                pointDiv.className = pointClass;
+
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'point-icon';
+                iconDiv.innerHTML = `<i class="fas ${iconClass}"></i>`;
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'point-content';
+
+                const textDiv = document.createElement('div');
+                textDiv.className = 'point-text';
+                textDiv.textContent = text;
+
+                const weightDiv = document.createElement('div');
+                weightDiv.className = 'weight-container';
+                weightDiv.innerHTML = `<span class="weight-label">Peso: ${weight}</span>`;
+
+                contentDiv.appendChild(textDiv);
+                contentDiv.appendChild(weightDiv);
+
+                pointDiv.appendChild(iconDiv);
+                pointDiv.appendChild(contentDiv);
+
+                list.appendChild(pointDiv);
+            }
+
+            // Tomar decisão
+            decisionBtn.addEventListener('click', function() {
+                const decision = decisionInput.value.trim();
+                const prosPoints = Array.from(prosList.children);
+                const consPoints = Array.from(consList.children);
+
+                if (!decision) {
+                    alert('Por favor, descreva a decisão que precisa tomar.');
+                    decisionInput.focus();
+                    return;
+                }
+
+                if (prosPoints.length === 0 && consPoints.length === 0) {
+                    alert('Adicione pelo menos um ponto positivo ou negativo.');
+                    return;
+                }
+
+                // Calcular peso total dos pontos positivos
+                let prosTotal = 0;
+                prosPoints.forEach(point => {
+                    const weightText = point.querySelector('.weight-label').textContent;
+                    const weight = parseInt(weightText.split(': ')[1]) || 0;
+                    prosTotal += weight;
+                });
+
+                // Calcular peso total dos pontos negativos
+                let consTotal = 0;
+                consPoints.forEach(point => {
+                    const weightText = point.querySelector('.weight-label').textContent;
+                    const weight = parseInt(weightText.split(': ')[1]) || 0;
+                    consTotal += weight;
+                });
+
+                decisionResult.style.display = 'block';
+
+                if (prosTotal > consTotal) {
+                    decisionResult.className = 'decision-result pros-result';
+                    decisionResult.innerHTML = `
+                        <h2>Sugestão: <i class="fas fa-check-circle"></i></h2>
+                        <p>${decision}</p>
+                        <p>Você deve considerar fazer isso!</p>
+                        <p>Pontos positivos superam os negativos (${prosTotal} a ${consTotal})</p>
+                    `;
+                } else if (consTotal > prosTotal) {
+                    decisionResult.className = 'decision-result cons-result';
+                    decisionResult.innerHTML = `
+                        <h2>Sugestão: <i class="fas fa-times-circle"></i></h2>
+                        <p>${decision}</p>
+                        <p>Considere não fazer isso no momento</p>
+                        <p>Pontos negativos superam os positivos (${consTotal} a ${prosTotal})</p>
+                    `;
+                } else {
+                    decisionResult.className = 'decision-result balance-result';
+                    decisionResult.innerHTML = `
+                        <h2>Sugestão: <i class="fas fa-balance-scale"></i></h2>
+                        <p>${decision}</p>
+                        <p>Pontos positivos e negativos estão em equilíbrio</p>
+                        <p>Considere explorar mais aspectos (${prosTotal} a ${consTotal})</p>
+                    `;
+                }
+
+                // Rolagem suave para o resultado
+                decisionResult.scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Adicionar pontos com Enter
+            newProsInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addProsBtn.click();
+                }
+            });
+
+            newConsInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addConsBtn.click();
+                }
+            });
+
+            decisionInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    decisionBtn.click();
+                }
+            });
+
+            // Validar peso ao digitar
+            newProsWeight.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (value < 0) this.value = 0;
+                if (value > 5) this.value = 5;
+            });
+
+            newConsWeight.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (value < 0) this.value = 0;
+                if (value > 5) this.value = 5;
+            });
+        });
+    </script>
+</body>
+</html>
